@@ -9,15 +9,15 @@
 #define SDL_UTILITIES_H
 
 #ifdef __APPLE__
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_rotozoom.h>
+	#include <SDL.h>
+	#include <SDL_image.h>
+	#include <SDL_ttf.h>
+	#include <SDL_rotozoom.h>
 #else
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_rotozoom.h>
+	#include <SDL/SDL.h>
+	#include <SDL/SDL_image.h>
+	#include <SDL/SDL_ttf.h>
+	#include <SDL/SDL_rotozoom.h>
 #endif
 
 #include <string>

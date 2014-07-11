@@ -1,3 +1,5 @@
+#include "Utilities.h"
+#include "SDL_Utilities.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -5,10 +7,10 @@
 #include <iostream>
 
 #ifdef __APPLE__
-	#include <SDL/SDL.h>
-	#include <SDL/SDL_image.h>
-	#include <SDL/SDL_ttf.h>
-	#include <SDL/SDL_getenv.h>
+	#include <SDL.h>
+	#include <SDL_image.h>
+	#include <SDL_ttf.h>
+	#include <SDL_getenv.h>
 #else
 	#include <SDL.h>
 	#include <SDL_image.h>
@@ -16,10 +18,8 @@
 	#include <SDL_getenv.h>
 #endif
 
-#include "Utilities.h"
-#include "SDL_Utilities.h"
-
 using namespace std;
+using namespace Utilities;
 
 SDL_Surface* screen = NULL;
 SDL_Surface* application_icon = NULL ;

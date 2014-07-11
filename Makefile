@@ -1,40 +1,65 @@
 # Makefile created by N.Richard
 # Cours Multi-threading EPSI
-# Version 1.7 
+# Date de création : 4 janvier 2006
+# Date de version : 20/07/2018
+# Version 2.4
 
-CC=g++
-PREFIX = .
-SRCDIR = $(PREFIX)/src
-INCDIR = $(PREFIX)/include
-#un répertoire n'est pas intéressant car les chemins (relatif) posent souvent problèmes
-EXEC = blur
-SRC = $(wildcard $(SRCDIR)/*.cpp)
-OBJ = $(SRC:.cpp=.o)
-DEPENDS = $(SRC:.cpp=.d)
-#CFLAGS += `pkg-config --cflags sdl SDL_image` -fopenmp -O3 -pedantic -Wall -Wextra
-CXXFLAGS += `pkg-config --cflags sdl SDL_image SDL_ttf SDL_gfx` -fopenmp -O3 -Wall -Wno-narrowing -pedantic -Wextra -Woverloaded-virtual -Wfloat-equal -Wpointer-arith -Wshadow -Weffc++ -Wredundant-decls -Winit-self -Wswitch-default -Wundef -Wlong-long -std=c++11 -Werror#-Wconversion # #
-LDFLAGS += `pkg-config --libs sdl SDL_image SDL_ttf SDL_gfx` -fopenmp -lm #-lpthread -D_REENTRANT
- 
-.PHONY : run clean mrproper
+CC := g++
+PREFIX := .
+SRCDIR := $(PREFIX)/src
+INCDIR := $(PREFIX)/lib
+#un répertoire pour le binaire n'est pas intéressant car les chemins (relatif) posent souvent problèmes
+EXEC := blur
+SRC := $(wildcard $(SRCDIR)/*.cpp)
+HEADERS := $(wildcard $(SRCDIR)/*.h)
+OBJ := $(SRC:.cpp=.o)
+#NDEBUG = RELEASE
+#-Wfatal-errors : le compilateur s'arrêtera à la 1ère erreur rencontrée (ici un simple warning)
+#Volontairement omis pour des raisons de performances : -Wconversion -Winline -Wsign-compare (-Wall)
+# -MNO-AVX uniquement sous Mac ou -Wa,-q pour utiliser l'AS de Clang
+CXXFLAGS += `sdl-config --cflags` -O3 -fopenmp -Wa,-q -pipe -std=c++11
+CXX_RELEASE_FLAGS := -DNDEBUG  -march=native -fstack-protector --param=ssp-buffer-size=4
+CXX_DEBUG_FLAGS := -pedantic -Wall -Wno-narrowing -Wextra -Woverloaded-virtual \
+	-Wwrite-strings -Wno-variadic-macros -Wno-unused-parameter -Wno-unused-variable -Wvolatile-register-var -Wunsafe-loop-optimizations -Wcast-qual \
+	-Wunknown-pragmas -Wmissing-include-dirs -Wstack-protector -Wfloat-equal -Wstrict-null-sentinel \
+	-Wpointer-arith -Wredundant-decls -Winit-self -Wswitch-default -Wswitch-enum -Wundef -Wlong-long -Werror  \
+	-Weffc++ -Wold-style-cast -Wcast-align -Wdouble-promotion -Wlogical-op -Wfatal-errors -Wno-sign-compare
 
-all: $(EXEC)
+GCC_VER_MAJOR := $(shell $(CC) -dumpversion | cut -f1 -d.)
+GCC_VER_MINOR := $(shell $(CC) -dumpversion | cut -f2 -d.)
+GCC_VER_GT_4_9 := $(shell test $(GCC_VER_MAJOR) -gt 4 -o \( $(GCC_VER_MAJOR) -eq 4 -a $(GCC_VER_MINOR) -ge 9 \) && echo true)
 
-$(EXEC): $(OBJ)
-	$(CC) $^ -o $@ $(LDFLAGS) 
+ifeq ($(GCC_VER_GT_4_9),true)
+	CXXFLAGS += -fdiagnostics-color=auto -fopenmp-simd
+endif
+
+#CFLAGS += -O3 -pedantic -Wall -Wextra -fopenmp `pkg-config --cflags sdl SDL_image SDL_ttf SDL_gfx`
+LDFLAGS += `sdl-config --cflags --libs` -lSDL_image -lSDL_ttf -lSDL_gfx -fopenmp -lm -lpthread 
+
+.PHONY : all debug release run clean mrproper
+
+all: release
+
+debug: CXXFLAGS += $(CXX_DEBUG_FLAGS)
+debug: $(EXEC)
+
+release: CXXFLAGS += $(CXX_RELEASE_FLAGS)
+release: $(EXEC)
+
+$(EXEC): $(OBJ) $(HEADERS)
+	$(CC) $^ -o $@ $(LDFLAGS)
 	@printf " \033[1;32mCompilation success !\033[0m\n"
 
-%.d: %.cpp
-	@$(CC) -MM $< > $@ 
+%.o: %.c %.h
+	$(CC) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
 
--include $(DEPENDS)
-
-run: 
+run:
 	@$(MAKE) && ./$(EXEC) ./img/testing.jpg
 
 clean:
 	@printf "  \033[1;31m\033[4mRemoved files\033[0m\033[31m :\n"
-	@printf "\t*~ a.out core *.d \n\t$(OBJ)\033[0m\n"
-	@$(RM) -rf *~ a.out core $(DEPENDS) $(OBJ)
+	@printf "\t*~ a.out core *.gch\n\t$(OBJ)\033[0m\n"
+	@$(RM) -rf *~ a.out core $(SRCDIR)/*.gch $(OBJ)
 
 mrproper: clean
 	@printf "\033[31m\t$(EXEC)\033[0m\n"
