@@ -1,3 +1,5 @@
+#include "Utilities.h"
+#include "SDL_Utilities.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -16,10 +18,8 @@
 	#include <SDL_getenv.h>
 #endif
 
-#include "Utilities.h"
-#include "SDL_Utilities.h"
-
 using namespace std;
+using namespace Utilities;
 
 SDL_Surface* screen = NULL;
 SDL_Surface* application_icon = NULL ;

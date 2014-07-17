@@ -1,2 +1,8 @@
 
 *.d
+
+*.o
+
+carac_recognize
+
+blur
