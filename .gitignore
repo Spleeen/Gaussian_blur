@@ -1,8 +1,23 @@
+# Binairies #
+bin/
+blur
 
+# Compiled source #
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
 *.d
 
-*.o
-
-carac_recognize
-
-blur
+# OS generated files #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+~$*
+web/*
