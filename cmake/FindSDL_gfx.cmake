@@ -1,0 +1,33 @@
+
+if (SDL_GFX_INCLUDE_DIR AND SDL_GFX_LIBRARY)
+    set(SDL_gfx_QUIET TRUE)
+endif ()
+
+
+find_path(
+    SDL_GFX_INCLUDE_DIR
+    NAMES "SDL_rotozoom.h"
+    PATH_SUFFIXES SDL)
+
+find_library(
+    SDL_GFX_LIBRARY
+    NAMES SDL_gfx
+    HINTS "/opt/local/lib")
+
+mark_as_advanced(SDL_GFX_INCLUDE_DIR SDL_GFX_LIBRARY)
+
+if (SDL_GFX_INCLUDE_DIR AND SDL_GFX_LIBRARY)
+    set(SDLGFX_FOUND TRUE)
+    set(SDLGFX_INCLUDE_DIR ${SDL_GFX_INCLUDE_DIR})
+    set(SDLGFX_LIBRARIES ${SDL_GFX_LIBRARY})
+
+    mark_as_advanced(SDLGFX_FOUND SDLGFX_INCLUDE_DIR SDLGFX_LIBRARIES)
+
+    if (NOT SDL_gfx_FIND_QUIETLY AND NOT SDL_gfx_QUIET)
+        MESSAGE(STATUS "Found SDL_gfx : ${SDL_GFX_LIBRARY}")
+    endif ()
+endif ()
+
+IF (NOT SDLGFX_FOUND AND SDL_gfx_FIND_REQUIRED)
+    MESSAGE(FATAL_ERROR "Could not find SDL_gfx library ${SDLGFX_INCLUDE_DIR}")
+endif ()
